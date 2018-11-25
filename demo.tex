@@ -55,11 +55,29 @@
   \end{columns}		  
 \end{frame}
 
+\begin{frame}{поиск частей программ для отображения на ПЛИС}
+  \framesubtitle{выбор ограниченных участков}
+   
+  \begin{columns}
+    \column{.7\textwidth}
+      \begin{itemize}
+        \item Повторяющиеся группы операторов или выражения
+        \item Такие операторы, которые наш компилятор сможет конвейеризовать
+        \item Похожие выражения, по которым можно построить общий ковейер
+      \end{itemize}
+
+    \column{.3\textwidth}
+      \begin{block}{Для чего}
+         Можно быстро оценить перспективы программы для ПЛИС (исследование пространства возможных характеристик) за счет расширяемых архитектур IP-ядер и добавления инструкций к ним.
+      \end{block}
+  \end{columns}		  
+\end{frame}
+
 \begin{frame}[fragile]
 \frametitle{Метрики кода и поверхностный статический анализ}
   \framesubtitle{Может ли это работать}
   \begin{columns}
-    \column{.2\textwidth}
+    \column{.4\textwidth}
       \begin{itemize}
         \item Быстро работает
         \item Легко реализовать
@@ -69,7 +87,7 @@
          Тяжело получить хороший результат. Возможно накопление базы для применения методов машинного обучения (комп. статистики)
       \end{block}
 
-    \column{.8\textwidth}
+    \column{.6\textwidth}
       
       
 % TODO: хороший пример      
@@ -87,6 +105,53 @@
 \end{frame}
 
 \begin{frame}[fragile]
+\frametitle{Поиск специальных гнезд циклов}
+  \framesubtitle{}
+  \begin{table}
+    \begin{tabular}{ | p{1.5cm} | p{2cm} | p{1cm} | p{6cm} |}
+    \hline
+    Программа & долго счит. & интересных & особенности \\ \hline
+    adpcm & 3 & 0 & нельзя заранее определить число итераций \\ \hline
+    aes & 3 & 1 &  \\ \hline
+    blowfish & 1 & 0 & цикл уже полностью развернут в исходном коде \\ \hline
+    dfadd & 1 & 0 &  \\ \hline
+    dfdiv & 1 & 0 &  \\ \hline
+    dfmul & 1 & 0 &  \\ \hline
+    dfsin & 1 & 0 &  \\ \hline
+    gsm & 1 & 0 &  \\ \hline
+    jpeg & 4 & 2 & нельзя заранее определить число итераций \\ \hline
+    mips & 1 & 1 & нельзя заранее определить число итераций \\ \hline
+    motion & 2 & 0 &  \\ \hline
+    sha & 1 & 0 &  \\ \hline
+    \end{tabular} 
+    \caption{Результаты поиска специальных циклов в бенчмарках CHStone}
+    \label{table:CHStoneSingularLoops}
+\end{table}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Статическое профилирование}
+  \framesubtitle{}
+  \begin{columns}
+    \column{.5\textwidth}
+        \begin{itemize}
+            \item Быстрый анализ 
+            \item Неточный
+            \item Работает на простых примерах
+        \end{itemize}      
+
+    \column{.5\textwidth}
+    \begin{block}{Не подходит для ПЛИС?}
+         Простой подсчет числа операций очевидно не дает оценки характеристик конвейера.
+         Полезным может быть только оценка интенсивности обмена с памятью
+      \end{block}
+    \label{encode_listing}
+      
+\end{columns}
+  
+\end{frame}
+
+\begin{frame}[fragile]
 \frametitle{Статический анализ}
   \framesubtitle{}
   \begin{columns}
@@ -96,7 +161,6 @@
             \item Граф вычислений
             \item Конвейеризуемые циклы
         \end{itemize}      
-
 
     \column{.8\textwidth}
  
@@ -111,6 +175,59 @@
       
   \end{columns}
   
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Статический анализ}
+  \framesubtitle{Сложности}
+  \begin{columns}
+    \column{.5\textwidth}
+        \begin{itemize}
+            \item Хуже, если поведение программы зависит от входных данных
+            \item Продвинутые методы анализа долго работают
+            \item Не все реально конвейеризуемые циклы легко найти
+        \end{itemize}      
+
+    \column{.5\textwidth}
+
+// хорошо, когда приходится работать с канонизируемыми
+// циклами: 
+\begin{lstlisting}[frame=single]
+for(i=0; i<C; i++)
+{
+    ... = [Affine(i)];
+}
+
+}
+\end{lstlisting}
+\label{encode_listing}
+      
+  \end{columns}
+  
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Статический анализ}
+  \framesubtitle{Сложности}
+  
+чаще попадаются такие циклы: 
+\begin{lstlisting}[frame=single]
+while(1)
+{
+    ...
+    default:
+      break;
+}
+for(;;)
+{
+    ...
+    case M_EOI:
+       return;
+}
+
+\end{lstlisting}
+\label{encode_listing}
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -149,8 +266,21 @@
 
 \begin{frame}{Фазы выполнения программы}
   \framesubtitle{что это значит}
-  %TODO: график из какого-то источника?
-  
+   
+  \begin{columns}
+    \column{.7\textwidth}
+        \includegraphics[height=.9\textheight]{img/Phases.png}
+
+    \column{.3\textwidth}
+      imothy Sherwood, Erez Perelman, Greg Hamerly, Suleyman Sair, and Brad Calder, Discovering and Exploiting Program Phases, IEEE Micro: Micro's Top Picks from Computer Architecture Conferences
+      
+     % Figure 1.Plot of metrics over billions of instructions executed by the programs
+ % gzip with input graphic (a) and gcc with input 166 (b). Each point on the graph
+% is an average over 10 million instructions. These graphs plot the number of uni-
+% fied L2 cache misses (ul2), energy consumed by the execution of the instruc-
+% tions, number of instruction cache misses (il1), number of data cache misses
+% (dl1), number of branch mispredicts (bpred), and the average IPC.
+  \end{columns}		  
 \end{frame}
 
 \begin{frame}{Фазы выполнения программы}
@@ -165,6 +295,31 @@
   % TODO: конкретные (не голословные) оценки, см. бенчмарки
   % TODO: визуализация на основе chstone?
   
+\end{frame}
+
+\begin{frame}{Фазы выполнения программы}
+  \framesubtitle{бенчмарки}
+  \begin{table}
+    \begin{tabular}{ | p{1.5cm} | p{2cm} | p{1cm} | p{6cm} |}
+    \hline
+    Программа & долго счит. гнезд & включают ключ. инт. & особенности \\ \hline
+    adpcm & 3 & 3 &  \\ \hline
+    aes & 3 & 2 &  \\ \hline
+    blowfish & 1 & 1 &  \\ \hline
+    dfadd & 1 & 1 &  \\ \hline
+    dfdiv & 1 & 0 &  \\ \hline
+    dfmul & 1 & 1 &  \\ \hline
+    dfsin & 1 & 0 &  \\ \hline
+    gsm & 1 & 0 &  \\ \hline
+    jpeg & 4 & 3 & \\ \hline
+    mips & 1 & 1 & \\ \hline
+    motion & 2 & 1 &  \\ \hline
+    sha & 1 & 1 &  \\ \hline
+    \end{tabular} 
+    \caption{Результаты поиска ключевых интервалов в бенчмарках CHStone}
+    \label{table:CHStoneSimpoints}
+\end{table}
+
 \end{frame}
 
 \begin{frame}{Выбор уровня представления программы для анализа}
@@ -212,13 +367,34 @@
 \end{frame}
 
 \begin{frame}{Вектор простых блоков}
-  \framesubtitle{}
+  \framesubtitle{Вектор простых блоков}
   
   \begin{itemize}
       \item Статистика по простым блокам, посещенным во время выполнения
       \item Позволяет статистически оценить поведение программы на тестовых данных
       \item Позволяет найти выборку простых блоков (и конкретные моменты во время работы), по которым можно прогнозировать время работы программы в целом
   \end{itemize}
+  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Вектор простых блоков}
+  
+  \begin{lstlisting}[frame=single]
+ 
+
+  
+  T:182:3   :180:3   :177:3   :1068:6   :1069:4   :1070:7   :1071:4   :1074:8   :1072:8   :1075:6   :1073:6   :1076:3   :1077:1   :1063:2   :1064:2   :1066:4   :1067:1   :1065:10      
+T:182:2   :180:1   :177:1   :1087:1   :1095:3   :1096:7   :1097:2   :1098:4   :1099:3   :1100:11   :1101:3   :1103:13   :1105:14   :1107:6   :1110:8   :1108:2   :1109:3   :1104:2   :1106:4   :1102:10   :1111:14   :1112:8   :1113:3   :1115:4   :1116:3   :1117:7   :1118:2   :1119:5   
+T:1138:385   :1136:154   :1137:461   
+T:1138:385   :1136:154   :1137:461   
+T:1138:385   :1136:154   :1137:461   
+T:1138:385   :1136:154   :1137:461   
+T:1138:385   :1136:153   :1137:462   
+T:1138:385   :1136:153   :1137:462   
+T:1138:384   :1136:154   :1137:462   
+\end{lstlisting}
+  
   
 \end{frame}
 
@@ -233,15 +409,21 @@
   
 \end{frame}
 
+
 \begin{frame}{Проект эмулятора}
   \framesubtitle{}
-  
-  \begin{itemize}
-      \item набор функциональных модулей
-      \item связи между ними
-      \item оценка времени работы при интерпретации
-  \end{itemize}
-  
+   
+  \begin{columns}
+    \column{.3\textwidth}
+      \begin{itemize}
+        \item набор функциональных модулей
+        \item связи между ними
+        \item оценка времени работы при интерпретации
+      \end{itemize}
+
+    \column{.7\textwidth}
+      \includegraphics[width=.8\textwidth]{img/Emulator.png}
+  \end{columns}		  
 \end{frame}
 
 \begin{frame}{Проект эмулятора - текущие результаты}
