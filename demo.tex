@@ -152,6 +152,27 @@
 \end{frame}
 
 \begin{frame}[fragile]
+\frametitle{Статическое профилирование}
+  \framesubtitle{для гетерогенной вычислительной системы}
+  \begin{columns}
+    \column{.5\textwidth}
+        \begin{itemize}
+             \item оценка времени работы на основе числа операций
+             \item эмпиричиский подбор цены операций для разных архитектур 
+             \item назначение разных частей программы на разные процессоры и оптимизация назначений
+        \end{itemize}      
+
+    \column{.5\textwidth}
+    \begin{block}{RISC + DSP}
+         
+      \end{block}
+    \label{encode_listing}
+      
+\end{columns}
+  
+\end{frame}
+
+\begin{frame}[fragile]
 \frametitle{Статический анализ}
   \framesubtitle{}
   \begin{columns}
@@ -423,6 +444,22 @@ T:1138:384   :1136:154   :1137:462
 
     \column{.7\textwidth}
       \includegraphics[width=.8\textwidth]{img/Emulator.png}
+  \end{columns}		  
+\end{frame}
+
+\begin{frame}{Обфускатор}
+  \framesubtitle{}
+   
+  \begin{columns}
+    \column{.3\textwidth}
+      \begin{itemize}
+        \item виртуальная машина со своим набором инструкций
+        \item снижение производительности
+        \item выполняет другую функцию, но построена по тому же принципу
+      \end{itemize}
+
+    \column{.7\textwidth}
+      замена инструкций или групп инструкций LLVM на эквивалентные
   \end{columns}		  
 \end{frame}
 
