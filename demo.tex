@@ -2,7 +2,8 @@
 %\documentclass[notes=only]{beamer}   % only notes
 \documentclass{beamer}              % only frames
 
-\usetheme{simple}
+%\usetheme{simple}
+\usetheme{metropolis}
 
 \usepackage{lmodern}
 \usepackage[scale=2]{ccicons}
@@ -13,6 +14,19 @@
 \usepackage{geometry}
 \usepackage{marginnote}
 \usepackage{movie15}
+\usepackage{xcolor}
+
+\definecolor{olive}{rgb}{0.3, 0.4, .1}
+\definecolor{fore}{RGB}{249,242,215}
+\definecolor{back}{RGB}{51,51,51}
+\definecolor{title}{RGB}{255,0,90}
+\definecolor{dgreen}{rgb}{0.,0.6,0.}
+\definecolor{gold}{rgb}{1.,0.84,0.}
+\definecolor{JungleGreen}{cmyk}{0.99,0,0.52,0}
+\definecolor{BlueGreen}{cmyk}{0.85,0,0.33,0}
+\definecolor{RawSienna}{cmyk}{0,0.72,1,0.45}
+\definecolor{Magenta}{cmyk}{0,1,0,0}
+
   
 % TODO: 
 %   position adjustement
@@ -22,14 +36,15 @@
 % Watermark background (simple theme)
 
 %\setwatermark[hoffset=2cm,voffset=1,5cm]{\includegraphics[height=8cm]{img/watermark1.png}}
-\setwatermark{\includegraphics[height=9cm]{img/watermark1.png}}
+%\setwatermark{\includegraphics[height=9cm]{img/watermark1.png}}
 
 
 \title{Поиск программ для ПЛИС с помощью профилирования и эмуляции}
-\subtitle{}
+\subtitle{\\ \textcolor{blue}{Национальный суперкомпьютерный форум 2018}}
 \date{\today}
 \author{Баглий Антон}
-\institute{\url{sfedu.ru}}
+\institute{\url{sfedu.ru} \\ \\ Работа выполняется при поддержке Российского фонда фундаментальных исследований, проект 18-37-00179}
+
 
 \begin{document}
 
@@ -108,6 +123,7 @@
 \frametitle{Поиск специальных гнезд циклов}
   \framesubtitle{}
   \begin{table}
+    \small
     \begin{tabular}{ | p{1.5cm} | p{2cm} | p{1cm} | p{6cm} |}
     \hline
     Программа & долго счит. & интересных & особенности \\ \hline
@@ -276,24 +292,25 @@ for(;;)
   
 \end{frame}
 
-% turn off watermark
-\setwatermark{}
+% turn off watermark 
+%\setwatermark{}
 
-\begin{frame}{Динамический анализ}
-  \framesubtitle{Инструментирование, профилирование}
+%\begin{frame}{Динамический анализ}
+%  \framesubtitle{Инструментирование, профилирование}
   %TODO: преимущества?
   %\includegraphics[height=8cm]{img/CalcGraphExample.png}
-\end{frame}
+%\end{frame}
 
 \begin{frame}{Фазы выполнения программы}
   \framesubtitle{что это значит}
    
   \begin{columns}
     \column{.7\textwidth}
-        \includegraphics[height=.9\textheight]{img/Phases.png}
+        \includegraphics[height=.8\textheight]{img/Phases.png}
 
     \column{.3\textwidth}
-      imothy Sherwood, Erez Perelman, Greg Hamerly, Suleyman Sair, and Brad Calder, Discovering and Exploiting Program Phases, IEEE Micro: Micro's Top Picks from Computer Architecture Conferences
+      \small
+      Timothy Sherwood, Erez Perelman, Greg Hamerly, Suleyman Sair, and Brad Calder, Discovering and Exploiting Program Phases, IEEE Micro: Micro's Top Picks from Computer Architecture Conferences
       
      % Figure 1.Plot of metrics over billions of instructions executed by the programs
  % gzip with input graphic (a) and gcc with input 166 (b). Each point on the graph
@@ -357,7 +374,7 @@ for(;;)
   \framesubtitle{}
   
   \begin{itemize}
-      \item Высокотоная эмуляция архитектуры процессора возможна
+      \item Высокоточная эмуляция архитектуры процессора возможна
       \item Но только по полному описанию этой архитектуры
       \item что если мы хотим сделать эмулятор для очень грубой оценки времени работы программы?
       \item ПЛИС это не архитектура, а конструктор любой архитектуры
@@ -388,25 +405,23 @@ for(;;)
 \end{frame}
 
 \begin{frame}{Вектор простых блоков}
-  \framesubtitle{Вектор простых блоков}
+  \framesubtitle{}
   
   \begin{itemize}
-      \item Статистика по простым блокам, посещенным во время выполнения
+      \item Статистика по простым блокам, посещенным во время выполнения \footnotemark
       \item Позволяет статистически оценить поведение программы на тестовых данных
       \item Позволяет найти выборку простых блоков (и конкретные моменты во время работы), по которым можно прогнозировать время работы программы в целом
   \end{itemize}
+  \footnotemark[1]{\tiny{Timothy Sherwood, Erez Perelman and Brad Calder, Basic Block Distribution Analysis to Find Periodic Behavior and Simulation Points in Applications , International Conference on Parallel Architectures and Compilation Techniques, September 2001}}
   
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Вектор простых блоков}
   
-  \begin{lstlisting}[frame=single]
- 
-
-  
+  \begin{lstlisting}[frame=single, basicstyle=\tiny]
   T:182:3   :180:3   :177:3   :1068:6   :1069:4   :1070:7   :1071:4   :1074:8   :1072:8   :1075:6   :1073:6   :1076:3   :1077:1   :1063:2   :1064:2   :1066:4   :1067:1   :1065:10      
-T:182:2   :180:1   :177:1   :1087:1   :1095:3   :1096:7   :1097:2   :1098:4   :1099:3   :1100:11   :1101:3   :1103:13   :1105:14   :1107:6   :1110:8   :1108:2   :1109:3   :1104:2   :1106:4   :1102:10   :1111:14   :1112:8   :1113:3   :1115:4   :1116:3   :1117:7   :1118:2   :1119:5   
+T:182:2   :180:1   :177:1   :1087:1   :1095:3   :1096:7   :1097:2   :1098:4   :1099:3  :1100:11   :1101:3   :1103:13   :1105:14   :1107:6   :1110:8   :1108:2   :1109:3   :1104:2   :1106:4   :1102:10   :1111:14   :1112:8   :1113:3   :1115:4   :1116:3   :1117:7   :1118:2   :1119:5   
 T:1138:385   :1136:154   :1137:461   
 T:1138:385   :1136:154   :1137:461   
 T:1138:385   :1136:154   :1137:461   
@@ -415,18 +430,39 @@ T:1138:385   :1136:153   :1137:462
 T:1138:385   :1136:153   :1137:462   
 T:1138:384   :1136:154   :1137:462   
 \end{lstlisting}
+
+\begin{lstlisting}[frame=single, basicstyle=\tiny]
+  int main()
+{
+	int x, y, z;
+	x = 12;
+	y = x + 22; 	
+	z = y + 33;       // :1:1
+                     
+	volatile int v;
+	while (v < 50000) // :2:50001 
+	{
+		v++;          //:3:50000 
+	}
+
+	return 0;         // :4:1
+}
+
+\end{lstlisting}
   
   
 \end{frame}
 
 
-\begin{frame}{Simpoints и аналогичные алгоритмы}
+\begin{frame}{Simpoints}
   \framesubtitle{}
   
   \begin{itemize}
-      \item Простой статистический метод выбора репрезентативных точек во время выполнения
+      \item Простой статистический метод выбора репрезентативных точек во время выполнения \footnotemark
       
   \end{itemize}
+  
+  \footnotetext[2]{\tiny{Greg Hamerly, Erez Perelman, Jeremy Lau, and Brad Calder, SimPoint 3.0: Faster and More Flexible Program Analysis , Workshop on Modeling, Benchmarking and Simulation, June 2005}}
   
 \end{frame}
 
@@ -443,7 +479,7 @@ T:1138:384   :1136:154   :1137:462
       \end{itemize}
 
     \column{.7\textwidth}
-      \includegraphics[width=.8\textwidth]{img/Emulator.png}
+      \includegraphics[width=1.0\textwidth]{img/Emulator.png}
   \end{columns}		  
 \end{frame}
 
@@ -457,10 +493,13 @@ T:1138:384   :1136:154   :1137:462
         \item снижение производительности
         \item выполняет другую функцию, но построена по тому же принципу
       \end{itemize}
-
+          
     \column{.7\textwidth}
-      замена инструкций или групп инструкций LLVM на эквивалентные
-  \end{columns}		  
+        \includegraphics[width=.9\textwidth]{img/RuleApplication.png}
+        \footnotemark
+  \end{columns}
+  \footnotetext[3]{\tiny{Алымова Е. В., Баглий А. П. и др., Мультиязычный обфускатор программ и компилируемая библиотека непрозрачных предикатов, Языки программирования
+и компиляторы — 2017, Труды конференции (3–5 апреля 2017 г.)}}
 \end{frame}
 
 \begin{frame}{Проект эмулятора - текущие результаты}
@@ -473,10 +512,14 @@ T:1138:384   :1136:154   :1137:462
   
 \end{frame}
 
-\begin{frame}[allowframebreaks]
-        \frametitle{References}
-        \bibliographystyle{amsalpha}
-        \bibliography{references.bib}
+%\begin{frame}[allowframebreaks]
+%        \frametitle{References}
+%        \bibliographystyle{amsalpha}
+%        \bibliography{references.bib}
+%\end{frame}
+
+\begin{frame}
+   Вопросы?
 \end{frame}
 
 \end{document}
